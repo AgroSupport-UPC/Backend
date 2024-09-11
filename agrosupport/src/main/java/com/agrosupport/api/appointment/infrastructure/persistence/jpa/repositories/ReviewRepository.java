@@ -3,8 +3,10 @@ package com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositor
 import com.agrosupport.api.appointment.domain.model.entities.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    Optional<Review> findByAdvisor_Id(Long advisorId);
+    List<Review> findByAdvisor_Id(Long advisorId);
+    Optional<Review> findByAdvisor_IdAndFarmer_Id(Long advisorId, Long farmerId);
 }

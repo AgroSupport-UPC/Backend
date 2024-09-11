@@ -26,8 +26,8 @@ public class Advisor {
         this.rating = 0;
     }
 
-    public Advisor(CreateAdvisorCommand command, User user) {
-        this.rating = command.rating();
+    public Advisor(User user) {
+        this.rating = 0;
         this.user = user;
     }
 

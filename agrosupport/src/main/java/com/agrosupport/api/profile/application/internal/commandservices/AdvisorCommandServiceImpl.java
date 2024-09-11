@@ -34,7 +34,7 @@ public class AdvisorCommandServiceImpl implements AdvisorCommandService {
         if (sameUser.isPresent()) {
             throw new SameUserException(command.userId());
         }
-        Advisor advisor = new Advisor(command, user.get());
+        Advisor advisor = new Advisor(user.get());
         advisorRepository.save(advisor);
         return advisor.getId();
     }

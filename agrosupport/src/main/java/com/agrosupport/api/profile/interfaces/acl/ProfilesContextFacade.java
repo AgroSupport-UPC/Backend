@@ -2,6 +2,7 @@ package com.agrosupport.api.profile.interfaces.acl;
 
 import com.agrosupport.api.profile.domain.model.aggregates.Profile;
 import com.agrosupport.api.profile.domain.model.commands.CreateNotificationCommand;
+import com.agrosupport.api.profile.domain.model.commands.UpdateAdvisorCommand;
 import com.agrosupport.api.profile.domain.model.entities.Advisor;
 import com.agrosupport.api.profile.domain.model.entities.Farmer;
 import com.agrosupport.api.profile.domain.model.entities.Notification;
@@ -18,13 +19,17 @@ public class ProfilesContextFacade {
     private final ProfileQueryService profileQueryService;
     private final FarmerQueryService farmerQueryService;
     private final AdvisorQueryService advisorQueryService;
+    private final AdvisorCommandService advisorCommandService;
     private final NotificationQueryService notificationQueryService;
     private final NotificationCommandService notificationCommandService;
 
-    public ProfilesContextFacade(ProfileQueryService profileQueryService, FarmerQueryService farmerQueryService, AdvisorQueryService advisorQueryService, NotificationQueryService notificationQueryService, NotificationCommandService notificationCommandService) {
+    public ProfilesContextFacade(ProfileQueryService profileQueryService, FarmerQueryService farmerQueryService,
+                                 AdvisorQueryService advisorQueryService, AdvisorCommandService advisorCommandService,
+                                 NotificationQueryService notificationQueryService, NotificationCommandService notificationCommandService) {
         this.profileQueryService = profileQueryService;
         this.farmerQueryService = farmerQueryService;
         this.advisorQueryService = advisorQueryService;
+        this.advisorCommandService = advisorCommandService;
         this.notificationQueryService = notificationQueryService;
         this.notificationCommandService = notificationCommandService;
     }
@@ -57,10 +62,13 @@ public class ProfilesContextFacade {
         return advisorQueryService.handle(getAdvisorByIdQuery);
     }
 
-
-
     public Long createNotification(CreateNotificationResource notification) {
         return notificationCommandService.handle(new CreateNotificationCommand(notification.userId(), notification.title(), notification.message(), notification.sendAt()));
     }
 
+    public void updateRating(Long advisorId, int rating) {
+        var advisor = advisorQueryService.handle(new GetAdvisorByUserIdQuery(advisorId));
+        if (advisor.isEmpty()) return;
+        advisorCommandService.handle(new UpdateAdvisorCommand(advisor.get().getId(), rating));
+    }
 }

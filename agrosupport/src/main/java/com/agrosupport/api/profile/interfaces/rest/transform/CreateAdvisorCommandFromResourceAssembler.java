@@ -6,7 +6,6 @@ import com.agrosupport.api.profile.interfaces.rest.resources.CreateAdvisorResour
 public class CreateAdvisorCommandFromResourceAssembler {
     public static CreateAdvisorCommand toCommandFromResource(CreateAdvisorResource resource) {
         return new CreateAdvisorCommand(
-                resource.userId(),
-                resource.rating());
+                resource.userId());
     }
 }

@@ -7,6 +7,7 @@ public class CreateReviewCommandFromResourceAssembler {
     public static CreateReviewCommand toCommandFromResource(CreateReviewResource resource){
         return new CreateReviewCommand(
                 resource.advisorId(),
+                resource.farmerId(),
                 resource.comment(),
                 resource.rating()
         );
