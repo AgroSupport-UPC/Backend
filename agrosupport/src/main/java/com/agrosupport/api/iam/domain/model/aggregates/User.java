@@ -1,7 +1,7 @@
 package com.agrosupport.api.iam.domain.model.aggregates;
 
 import com.agrosupport.api.iam.domain.model.entities.Role;
-//import com.agrosupport.api.profile.domain.model.entities.Notification;
+import com.agrosupport.api.profile.domain.model.entities.Notification;
 import com.agrosupport.api.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -41,8 +41,8 @@ public class User extends AuditableAbstractAggregateRoot<User> {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
-    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    //private List<Notification> notifications;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Notification> notifications;
 
     public User() {
         this.roles = new HashSet<>();
@@ -51,7 +51,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.username = username;
         this.password = password;
         this.roles = new HashSet<>();
-        //this.notifications = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     public User(String username, String password, List<Role> roles) {
