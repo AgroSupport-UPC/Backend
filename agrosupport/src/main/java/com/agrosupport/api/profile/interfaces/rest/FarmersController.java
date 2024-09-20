@@ -5,9 +5,7 @@ import com.agrosupport.api.profile.domain.model.queries.GetAllFarmersQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetFarmerByIdQuery;
 import com.agrosupport.api.profile.domain.services.FarmerCommandService;
 import com.agrosupport.api.profile.domain.services.FarmerQueryService;
-import com.agrosupport.api.profile.interfaces.rest.resources.CreateFarmerResource;
 import com.agrosupport.api.profile.interfaces.rest.resources.FarmerResource;
-import com.agrosupport.api.profile.interfaces.rest.transform.CreateFarmerCommandFromResourceAssembler;
 import com.agrosupport.api.profile.interfaces.rest.transform.FarmerResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -51,26 +49,6 @@ public class FarmersController {
         }
         var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
         return ResponseEntity.ok(farmerResource);
-    }
-
-    @PostMapping
-    public ResponseEntity<FarmerResource> createFarmer(@RequestBody CreateFarmerResource createFarmerResource) {
-        var createFarmerCommand = CreateFarmerCommandFromResourceAssembler.toCommandFromResource(createFarmerResource);
-        Long farmerId;
-        try {
-            farmerId = farmerCommandService.handle(createFarmerCommand);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
-        }
-        if(farmerId == 0L){
-            return ResponseEntity.badRequest().build();
-        }
-        var farmer = farmerQueryService.handle(new GetFarmerByIdQuery(farmerId));
-        if (farmer.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
-        return new ResponseEntity<>(farmerResource, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

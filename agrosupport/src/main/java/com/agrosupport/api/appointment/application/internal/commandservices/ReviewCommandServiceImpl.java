@@ -10,6 +10,7 @@ import com.agrosupport.api.appointment.domain.services.ReviewCommandService;
 import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositories.ReviewRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
 import java.util.Optional;
 
 @Service

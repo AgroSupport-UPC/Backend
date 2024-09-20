@@ -1,5 +1,6 @@
 package com.agrosupport.api.profile.application.internal.commandservices;
 
+import com.agrosupport.api.iam.domain.model.aggregates.User;
 import com.agrosupport.api.profile.application.internal.outboundservices.acl.ExternalUserService;
 import com.agrosupport.api.profile.domain.exceptions.FarmerNotFoundException;
 import com.agrosupport.api.profile.domain.exceptions.UserNotFoundException;
@@ -13,24 +14,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class FarmerCommandServiceImpl implements FarmerCommandService {
     private final FarmerRepository farmerRepository;
-    private final ExternalUserService externalUserService;
 
-    public FarmerCommandServiceImpl(FarmerRepository farmerRepository, ExternalUserService externalUserService) {
+    public FarmerCommandServiceImpl(FarmerRepository farmerRepository) {
         this.farmerRepository = farmerRepository;
-        this.externalUserService = externalUserService;
     }
 
     @Override
-    public Long handle(CreateFarmerCommand command) {
-        var user = externalUserService.fetchUserById(command.userId());
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(command.userId());
-        }
+    public Long handle(CreateFarmerCommand command, User user) {
         var sameUser = farmerRepository.findByUser_Id(command.userId());
         if (sameUser.isPresent()) {
             throw new UserNotFoundException(command.userId());
         }
-        var farmer = new Farmer(command, user.get());
+        var farmer = new Farmer(command, user);
         farmerRepository.save(farmer);
         return farmer.getId();
     }

@@ -1,7 +1,9 @@
 package com.agrosupport.api.iam.application.internal.commandservices;
 
+import com.agrosupport.api.iam.application.internal.outboundservices.acl.ExternalProfileRoleService;
 import com.agrosupport.api.iam.application.internal.outboundservices.hashing.HashingService;
 import com.agrosupport.api.iam.application.internal.outboundservices.tokens.TokenService;
+import com.agrosupport.api.iam.domain.exceptions.RoleNotFoundException;
 import com.agrosupport.api.iam.domain.model.aggregates.User;
 import com.agrosupport.api.iam.domain.model.commands.SignInCommand;
 import com.agrosupport.api.iam.domain.model.commands.SignUpCommand;
@@ -26,14 +28,15 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
-
     private final RoleRepository roleRepository;
+    private final ExternalProfileRoleService externalProfileRoleService;
 
-    public UserCommandServiceImpl(UserRepository userRepository, HashingService hashingService, TokenService tokenService, RoleRepository roleRepository) {
+    public UserCommandServiceImpl(UserRepository userRepository, HashingService hashingService, TokenService tokenService, RoleRepository roleRepository, ExternalProfileRoleService externalProfileRoleService) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;
         this.roleRepository = roleRepository;
+        this.externalProfileRoleService = externalProfileRoleService;
     }
 
     /**
@@ -68,9 +71,18 @@ public class UserCommandServiceImpl implements UserCommandService {
     public Optional<User> handle(SignUpCommand command) {
         if (userRepository.existsByUsername(command.username()))
             throw new RuntimeException("Username already exists");
-        var roles = command.roles().stream().map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> new RuntimeException("Role name not found"))).toList();
+        var roles = command.roles().stream().map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> new RoleNotFoundException(role.getStringName()))).toList();
         var user = new User(command.username(), hashingService.encode(command.password()), roles);
         userRepository.save(user);
+        //Create farmer or advisor depending on the role
+        roles.forEach(role -> {
+            if (role.getStringName().equals("ROLE_FARMER")) {
+                externalProfileRoleService.createFarmer(user.getId(), user);
+            }
+            if (role.getStringName().equals("ROLE_ADVISOR")) {
+                externalProfileRoleService.createAdvisor(user.getId(), user);
+            }
+        });
         return userRepository.findByUsername(command.username());
     }
 }
