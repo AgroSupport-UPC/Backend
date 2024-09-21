@@ -1,6 +1,7 @@
 package com.agrosupport.api.profile.application.internal.queryservices;
 
 import com.agrosupport.api.profile.domain.model.aggregates.Profile;
+import com.agrosupport.api.profile.domain.model.queries.GetAllAdvisorProfilesQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetAllProfilesQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetProfileByIdQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetProfileByUserIdQuery;
@@ -32,5 +33,10 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
     @Override
     public Optional<Profile> handle(GetProfileByUserIdQuery query) {
         return profileRepository.findByUser_Id(query.userId());
+    }
+
+    @Override
+    public List<Profile> handle(GetAllAdvisorProfilesQuery query){
+        return profileRepository.findAllAdvisorProfiles();
     }
 }

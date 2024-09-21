@@ -2,6 +2,7 @@ package com.agrosupport.api.profile.interfaces.rest;
 
 import com.agrosupport.api.profile.domain.model.commands.DeleteAdvisorCommand;
 import com.agrosupport.api.profile.domain.model.queries.GetAdvisorByIdQuery;
+import com.agrosupport.api.profile.domain.model.queries.GetAdvisorByUserIdQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetAllAdvisorsQuery;
 import com.agrosupport.api.profile.domain.services.AdvisorCommandService;
 import com.agrosupport.api.profile.domain.services.AdvisorQueryService;
@@ -44,6 +45,17 @@ public class AdvisorsController {
     public ResponseEntity<AdvisorResource> getAdvisorById(@PathVariable Long id) {
         var getAdvisorByIdQuery = new GetAdvisorByIdQuery(id);
         var advisor = advisorQueryService.handle(getAdvisorByIdQuery);
+        if (advisor.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var advisorResource = AdvisorResourceFromEntityAssembler.toResourceFromEntity(advisor.get());
+        return ResponseEntity.ok(advisorResource);
+    }
+
+    @GetMapping("/{userId}/user")
+    public ResponseEntity<AdvisorResource> getAdvisorByUserId(@PathVariable Long userId) {
+        var getAdvisorByUserIdQuery = new GetAdvisorByUserIdQuery(userId);
+        var advisor = advisorQueryService.handle(getAdvisorByUserIdQuery);
         if (advisor.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

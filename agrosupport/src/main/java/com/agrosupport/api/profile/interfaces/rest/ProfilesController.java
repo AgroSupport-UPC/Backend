@@ -3,8 +3,10 @@ package com.agrosupport.api.profile.interfaces.rest;
 import com.agrosupport.api.profile.domain.model.aggregates.Profile;
 import com.agrosupport.api.profile.domain.model.commands.DeleteProfileCommand;
 import com.agrosupport.api.profile.domain.model.commands.UpdateProfileCommand;
+import com.agrosupport.api.profile.domain.model.queries.GetAllAdvisorProfilesQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetAllProfilesQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetProfileByIdQuery;
+import com.agrosupport.api.profile.domain.model.queries.GetProfileByUserIdQuery;
 import com.agrosupport.api.profile.domain.services.ProfileCommandService;
 import com.agrosupport.api.profile.domain.services.ProfileQueryService;
 import com.agrosupport.api.profile.interfaces.rest.resources.CreateProfileResource;
@@ -57,6 +59,25 @@ public class ProfilesController {
         }
         var profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
         return ResponseEntity.ok(profileResource);
+    }
+
+    @GetMapping("/{userId}/user")
+    public ResponseEntity<ProfileResource> getProfileByUserId(@PathVariable Long userId) {
+        var getProfileByUserIdQuery = new GetProfileByUserIdQuery(userId);
+        var profile = profileQueryService.handle(getProfileByUserIdQuery);
+        if (profile.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
+        return ResponseEntity.ok(profileResource);
+    }
+
+    @GetMapping("/advisors")
+    public ResponseEntity<List<ProfileResource>> getAdvisors() {
+        var GetAllAdvisorProfilesQuery = new GetAllAdvisorProfilesQuery();
+        var profiles = profileQueryService.handle(GetAllAdvisorProfilesQuery);
+        var profileResources = profiles.stream().map(ProfileResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(profileResources);
     }
 
     @PostMapping
