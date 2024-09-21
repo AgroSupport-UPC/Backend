@@ -1,9 +1,8 @@
 package com.agrosupport.api.profile.application.internal.commandservices;
 
-import com.agrosupport.api.profile.application.internal.outboundservices.acl.ExternalUserService;
+import com.agrosupport.api.iam.domain.model.aggregates.User;
 import com.agrosupport.api.profile.domain.exceptions.AdvisorNotFoundException;
 import com.agrosupport.api.profile.domain.exceptions.SameUserException;
-import com.agrosupport.api.profile.domain.exceptions.UserNotFoundException;
 import com.agrosupport.api.profile.domain.model.commands.CreateAdvisorCommand;
 import com.agrosupport.api.profile.domain.model.commands.DeleteAdvisorCommand;
 import com.agrosupport.api.profile.domain.model.commands.UpdateAdvisorCommand;
@@ -17,24 +16,18 @@ import java.util.Optional;
 @Service
 public class AdvisorCommandServiceImpl implements AdvisorCommandService {
     private final AdvisorRepository advisorRepository;
-    private final ExternalUserService externalUserService;
 
-    public AdvisorCommandServiceImpl(AdvisorRepository advisorRepository, ExternalUserService externalUserService) {
+    public AdvisorCommandServiceImpl(AdvisorRepository advisorRepository) {
         this.advisorRepository = advisorRepository;
-        this.externalUserService = externalUserService;
     }
 
     @Override
-    public Long handle(CreateAdvisorCommand command) {
-        var user = externalUserService.fetchUserById(command.userId());
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(command.userId());
-        }
+    public Long handle(CreateAdvisorCommand command, User user) {
         var sameUser = advisorRepository.findByUser_Id(command.userId());
         if (sameUser.isPresent()) {
             throw new SameUserException(command.userId());
         }
-        Advisor advisor = new Advisor(user.get());
+        Advisor advisor = new Advisor(user);
         advisorRepository.save(advisor);
         return advisor.getId();
     }
