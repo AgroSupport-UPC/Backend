@@ -3,6 +3,7 @@ package com.agrosupport.api.appointment.interfaces.rest;
 import com.agrosupport.api.appointment.domain.model.commands.DeleteReviewCommand;
 import com.agrosupport.api.appointment.domain.model.entities.Review;
 import com.agrosupport.api.appointment.domain.model.queries.GetAllReviewsQuery;
+import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetReviewByIdQuery;
 import com.agrosupport.api.appointment.domain.services.ReviewCommandService;
 import com.agrosupport.api.appointment.domain.services.ReviewQueryService;
@@ -55,6 +56,14 @@ public class ReviewsController {
         }
         var reviewResource = ReviewResourceFromEntityAssembler.toResourceFromEntity(review.get());
         return ResponseEntity.ok(reviewResource);
+    }
+
+    @GetMapping("/advisor/{advisorId}")
+    public ResponseEntity<List<ReviewResource>> getReviewsByAdvisorId(@PathVariable Long advisorId) {
+        var getReviewByAdvisorIdQuery = new GetReviewByAdvisorIdQuery(advisorId);
+        var reviews = reviewQueryService.handle(getReviewByAdvisorIdQuery);
+        var reviewResources = reviews.stream().map(ReviewResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(reviewResources);
     }
 
     @PostMapping
