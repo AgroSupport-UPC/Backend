@@ -58,7 +58,7 @@ public class ReviewsController {
         return ResponseEntity.ok(reviewResource);
     }
 
-    @GetMapping("/advisor/{advisorId}")
+    @GetMapping("/{advisorId}/advisor")
     public ResponseEntity<List<ReviewResource>> getReviewsByAdvisorId(@PathVariable Long advisorId) {
         var getReviewByAdvisorIdQuery = new GetReviewByAdvisorIdQuery(advisorId);
         var reviews = reviewQueryService.handle(getReviewByAdvisorIdQuery);
