@@ -60,7 +60,7 @@ public class AppointmentsController {
         return ResponseEntity.ok(appointmentResource);
     }
 
-    @GetMapping("/farmer/{farmerId}")
+    @GetMapping("/{farmerId}/farmer")
     public ResponseEntity<List<AppointmentResource>> getAppointmentsByFarmerId(@PathVariable Long farmerId) {
         var getAppointmentsByFarmerIdQuery = new GetAppointmentsByFarmerIdQuery(farmerId);
         var appointments = appointmentQueryService.handle(getAppointmentsByFarmerIdQuery);
@@ -68,7 +68,7 @@ public class AppointmentsController {
         return ResponseEntity.ok(appointmentResources);
     }
 
-    @GetMapping("/advisor/{advisorId}")
+    @GetMapping("/{advisorId}/advisor")
     public ResponseEntity<List<AppointmentResource>> getAppointmentsByAdvisorId(@PathVariable Long advisorId) {
         var getAppointmentsByAdvisorIdQuery = new GetAppointmentsByAdvisorIdQuery(advisorId);
         var appointments = appointmentQueryService.handle(getAppointmentsByAdvisorIdQuery);
@@ -76,7 +76,7 @@ public class AppointmentsController {
         return ResponseEntity.ok(appointmentResources);
     }
 
-    @GetMapping("/advisor/{advisorId}/farmer/{farmerId}")
+    @GetMapping("/{advisorId}/advisor/{farmerId}/farmer")
     public ResponseEntity<List<AppointmentResource>> getAppointmentsByAdvisorIdAndFarmerId(@PathVariable Long advisorId, @PathVariable Long farmerId) {
         var getAppointmentsByAdvisorIdAndFarmerIdQuery = new GetAppointmentsByAdvisorIdAndFarmerIdQuery(advisorId, farmerId);
         var appointments = appointmentQueryService.handle(getAppointmentsByAdvisorIdAndFarmerIdQuery);
