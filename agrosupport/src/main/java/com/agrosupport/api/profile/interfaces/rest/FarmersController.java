@@ -3,6 +3,7 @@ package com.agrosupport.api.profile.interfaces.rest;
 import com.agrosupport.api.profile.domain.model.commands.DeleteFarmerCommand;
 import com.agrosupport.api.profile.domain.model.queries.GetAllFarmersQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetFarmerByIdQuery;
+import com.agrosupport.api.profile.domain.model.queries.GetFarmerByUserIdQuery;
 import com.agrosupport.api.profile.domain.services.FarmerCommandService;
 import com.agrosupport.api.profile.domain.services.FarmerQueryService;
 import com.agrosupport.api.profile.interfaces.rest.resources.FarmerResource;
@@ -44,6 +45,17 @@ public class FarmersController {
     public ResponseEntity<FarmerResource> getFarmerById(@PathVariable Long id) {
         var getFarmerByIdQuery = new GetFarmerByIdQuery(id);
         var farmer = farmerQueryService.handle(getFarmerByIdQuery);
+        if (farmer.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
+        return ResponseEntity.ok(farmerResource);
+    }
+
+    @GetMapping("/{userId}/user")
+    public ResponseEntity<FarmerResource> getAdvisorByUserId(@PathVariable Long userId) {
+        var getFarmerByUserIdQuery = new GetFarmerByUserIdQuery(userId);
+        var farmer = farmerQueryService.handle(getFarmerByUserIdQuery);
         if (farmer.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
