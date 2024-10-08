@@ -21,7 +21,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     @Override
     public List<Post> handle(GetAllPostsQuery query) {
-        return postRepository.findAll();
+        return postRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     @Override
