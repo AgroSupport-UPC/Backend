@@ -34,8 +34,8 @@ public class ExternalProfilesService {
         return profilesContextFacade.fetchProfileByAdvisorId(advisorId);
     }
 
-    public Long createNotification(Long userId, String title, String message, Date sendAt) {
-        return profilesContextFacade.createNotification(new CreateNotificationResource(userId, title, message, sendAt));
+    public void updateRating(Long advisorId, int rating) {
+        profilesContextFacade.updateRating(advisorId, rating);
     }
 
 

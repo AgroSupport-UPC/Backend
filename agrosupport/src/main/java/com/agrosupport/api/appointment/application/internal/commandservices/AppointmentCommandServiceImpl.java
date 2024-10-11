@@ -40,7 +40,9 @@ public class AppointmentCommandServiceImpl implements AppointmentCommandService 
             throw new IncorrectTimeFormatException(command.startTime(), command.endTime());
         }
 
-        Appointment appointment = new Appointment(command, advisor.get(), farmer.get());
+        var meetingUrl = "https://meet.jit.si/agrosupportMeeting" + command.farmerId() + "-" + command.advisorId();
+
+        Appointment appointment = new Appointment(command, meetingUrl, advisor.get(), farmer.get());
         appointmentRepository.save(appointment);
         return appointment.getId();
     }

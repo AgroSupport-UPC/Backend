@@ -2,6 +2,7 @@ package com.agrosupport.api.appointment.application.internal.queryservices;
 
 import com.agrosupport.api.appointment.domain.model.entities.Review;
 import com.agrosupport.api.appointment.domain.model.queries.GetAllReviewsQuery;
+import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdAndFarmerIdQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetReviewByIdQuery;
 import com.agrosupport.api.appointment.domain.services.ReviewQueryService;
@@ -30,7 +31,12 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     }
 
     @Override
-    public Optional<Review> handle(GetReviewByAdvisorIdQuery query) {
+    public List<Review> handle(GetReviewByAdvisorIdQuery query) {
         return reviewRepository.findByAdvisor_Id(query.advisorId());
+    }
+
+    @Override
+    public Optional<Review> handle(GetReviewByAdvisorIdAndFarmerIdQuery query) {
+        return reviewRepository.findByAdvisor_IdAndFarmer_Id(query.advisorId(), query.farmerId());
     }
 }

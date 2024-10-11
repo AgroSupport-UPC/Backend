@@ -4,6 +4,7 @@ import com.agrosupport.api.appointment.domain.model.aggregates.Appointment;
 import com.agrosupport.api.appointment.domain.model.commands.CreateReviewCommand;
 import com.agrosupport.api.appointment.domain.model.commands.UpdateReviewCommand;
 import com.agrosupport.api.profile.domain.model.entities.Advisor;
+import com.agrosupport.api.profile.domain.model.entities.Farmer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,9 +18,13 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "advisor_id")
     private Advisor advisor;
+
+    @ManyToOne
+    @JoinColumn(name = "farmer_id")
+    private Farmer farmer;
 
     @Column(columnDefinition = "TEXT")
     private String comment;
@@ -32,10 +37,11 @@ public class Review {
     public Review() {
     }
 
-    public Review(CreateReviewCommand command, Advisor advisor) {
+    public Review(CreateReviewCommand command, Advisor advisor, Farmer farmer) {
         this.comment = command.comment();
         this.rating = command.rating();
         this.advisor = advisor;
+        this.farmer = farmer;
     }
 
     public Review update(UpdateReviewCommand command) {
@@ -47,4 +53,5 @@ public class Review {
     public Long getAdvisorId() {
         return advisor.getId();
     }
+    public Long getFarmerId() { return farmer.getId(); }
 }

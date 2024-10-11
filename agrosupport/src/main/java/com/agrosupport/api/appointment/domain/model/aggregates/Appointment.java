@@ -45,10 +45,12 @@ public class Appointment extends AuditableAbstractAggregateRoot<Appointment> {
     @JoinColumn(name = "advisor_id")
     private Advisor advisor;
 
+    private String meetingUrl;
+
     public Appointment() {
     }
 
-    public Appointment(CreateAppointmentCommand command, Advisor advisor, Farmer farmer) {
+    public Appointment(CreateAppointmentCommand command, String meetingUrl, Advisor advisor, Farmer farmer) {
         this.scheduledDate = command.scheduledDate();
         this.startTime = command.startTime();
         this.endTime = command.endTime();
@@ -56,6 +58,7 @@ public class Appointment extends AuditableAbstractAggregateRoot<Appointment> {
         this.status = AppointmentStatus.valueOf(command.status().toUpperCase());
         this.farmer = farmer;
         this.advisor = advisor;
+        this.meetingUrl = meetingUrl;
     }
 
     public Appointment update(UpdateAppointmentCommand command){

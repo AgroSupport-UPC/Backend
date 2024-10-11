@@ -13,7 +13,8 @@ public class AppointmentResourceFromEntityAssembler {
                 entity.getAppointmentStatus(),
                 entity.getScheduledDate(),
                 entity.getStartTime(),
-                entity.getEndTime()
+                entity.getEndTime(),
+                entity.getMeetingUrl()
         );
     }
 }

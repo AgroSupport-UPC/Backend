@@ -9,5 +9,6 @@ public record AppointmentResource(Long id,
                                   String status,
                                   LocalDate scheduledDate,
                                   String startTime,
-                                  String endTime) {
+                                  String endTime,
+                                  String meetingUrl) {
 }

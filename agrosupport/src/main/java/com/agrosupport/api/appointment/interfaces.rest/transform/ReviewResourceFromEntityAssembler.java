@@ -8,6 +8,7 @@ public class ReviewResourceFromEntityAssembler {
         return new ReviewResource(
                 entity.getId(),
                 entity.getAdvisorId(),
+                entity.getFarmerId(),
                 entity.getComment(),
                 entity.getRating()
         );
