@@ -3,6 +3,7 @@ package com.agrosupport.api.post.interfaces.rest;
 import com.agrosupport.api.post.domain.model.aggregates.Post;
 import com.agrosupport.api.post.domain.model.commands.DeletePostCommand;
 import com.agrosupport.api.post.domain.model.queries.GetAllPostsQuery;
+import com.agrosupport.api.post.domain.model.queries.GetPostByAdvisorIdQuery;
 import com.agrosupport.api.post.domain.model.queries.GetPostByIdQuery;
 import com.agrosupport.api.post.domain.services.PostCommandService;
 import com.agrosupport.api.post.domain.services.PostQueryService;
@@ -55,6 +56,14 @@ public class PostsController {
         }
         var postResource = PostResourceFromEntityAssembler.toResourceFromEntity(post.get());
         return ResponseEntity.ok(postResource);
+    }
+
+    @GetMapping("/{advisorId}/advisor")
+    public ResponseEntity<List<PostResource>> getPostsByAdvisorId(@PathVariable Long advisorId) {
+        var getPostsByAdvisorIdQuery = new GetPostByAdvisorIdQuery(advisorId);
+        var posts = postQueryService.handle(getPostsByAdvisorIdQuery);
+        var postResources = posts.stream().map(PostResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(postResources);
     }
 
     @PostMapping
