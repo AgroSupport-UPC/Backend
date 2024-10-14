@@ -42,10 +42,30 @@ public class AppointmentsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AppointmentResource>> getAllAppointments() {
-        var getAllAppointmentsQuery = new GetAllAppointmentsQuery();
-        var appointments = appointmentQueryService.handle(getAllAppointmentsQuery);
-        var appointmentResources = appointments.stream().map(AppointmentResourceFromEntityAssembler::toResourceFromEntity).toList();
+    public ResponseEntity<List<AppointmentResource>> getAppointments(
+            @RequestParam(value = "farmerId", required = false) Long farmerId,
+            @RequestParam(value = "advisorId", required = false) Long advisorId) {
+
+        List<Appointment> appointments;
+
+        if (farmerId != null && advisorId != null) {
+            var query = new GetAppointmentsByAdvisorIdAndFarmerIdQuery(advisorId, farmerId);
+            appointments = appointmentQueryService.handle(query);
+        } else if (farmerId != null) {
+            var query = new GetAppointmentsByFarmerIdQuery(farmerId);
+            appointments = appointmentQueryService.handle(query);
+        } else if (advisorId != null) {
+            var query = new GetAppointmentsByAdvisorIdQuery(advisorId);
+            appointments = appointmentQueryService.handle(query);
+        } else {
+            var query = new GetAllAppointmentsQuery();
+            appointments = appointmentQueryService.handle(query);
+        }
+
+        var appointmentResources = appointments.stream()
+                .map(AppointmentResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
         return ResponseEntity.ok(appointmentResources);
     }
 
@@ -58,30 +78,6 @@ public class AppointmentsController {
         }
         var appointmentResource = AppointmentResourceFromEntityAssembler.toResourceFromEntity(appointment.get());
         return ResponseEntity.ok(appointmentResource);
-    }
-
-    @GetMapping("/{farmerId}/farmer")
-    public ResponseEntity<List<AppointmentResource>> getAppointmentsByFarmerId(@PathVariable Long farmerId) {
-        var getAppointmentsByFarmerIdQuery = new GetAppointmentsByFarmerIdQuery(farmerId);
-        var appointments = appointmentQueryService.handle(getAppointmentsByFarmerIdQuery);
-        var appointmentResources = appointments.stream().map(AppointmentResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(appointmentResources);
-    }
-
-    @GetMapping("/{advisorId}/advisor")
-    public ResponseEntity<List<AppointmentResource>> getAppointmentsByAdvisorId(@PathVariable Long advisorId) {
-        var getAppointmentsByAdvisorIdQuery = new GetAppointmentsByAdvisorIdQuery(advisorId);
-        var appointments = appointmentQueryService.handle(getAppointmentsByAdvisorIdQuery);
-        var appointmentResources = appointments.stream().map(AppointmentResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(appointmentResources);
-    }
-
-    @GetMapping("/{advisorId}/advisor/{farmerId}/farmer")
-    public ResponseEntity<List<AppointmentResource>> getAppointmentsByAdvisorIdAndFarmerId(@PathVariable Long advisorId, @PathVariable Long farmerId) {
-        var getAppointmentsByAdvisorIdAndFarmerIdQuery = new GetAppointmentsByAdvisorIdAndFarmerIdQuery(advisorId, farmerId);
-        var appointments = appointmentQueryService.handle(getAppointmentsByAdvisorIdAndFarmerIdQuery);
-        var appointmentResources = appointments.stream().map(AppointmentResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(appointmentResources);
     }
 
     @PostMapping
