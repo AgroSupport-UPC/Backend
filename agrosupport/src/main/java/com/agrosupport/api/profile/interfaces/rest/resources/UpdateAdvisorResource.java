@@ -1,4 +1,6 @@
 package com.agrosupport.api.profile.interfaces.rest.resources;
 
-public record UpdateAdvisorResource(Integer rating) {
+import java.math.BigDecimal;
+
+public record UpdateAdvisorResource(BigDecimal rating) {
 }
