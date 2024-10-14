@@ -3,6 +3,7 @@ package com.agrosupport.api.appointment.interfaces.rest;
 import com.agrosupport.api.appointment.domain.model.commands.DeleteReviewCommand;
 import com.agrosupport.api.appointment.domain.model.entities.Review;
 import com.agrosupport.api.appointment.domain.model.queries.GetAllReviewsQuery;
+import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdAndFarmerIdQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetReviewByIdQuery;
 import com.agrosupport.api.appointment.domain.services.ReviewCommandService;
@@ -64,6 +65,17 @@ public class ReviewsController {
         var reviews = reviewQueryService.handle(getReviewByAdvisorIdQuery);
         var reviewResources = reviews.stream().map(ReviewResourceFromEntityAssembler::toResourceFromEntity).toList();
         return ResponseEntity.ok(reviewResources);
+    }
+
+    @GetMapping("/{advisorId}/{farmerId}/review")
+    public ResponseEntity<ReviewResource> getReviewByAdvisorIdAndFarmerId(@PathVariable Long advisorId, @PathVariable Long farmerId) {
+        var getReviewByAdvisorIdAndFarmerIdQuery = new GetReviewByAdvisorIdAndFarmerIdQuery(advisorId, farmerId);
+        var reviewOptional = reviewQueryService.handle(getReviewByAdvisorIdAndFarmerIdQuery);
+        if (reviewOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var reviewResource = ReviewResourceFromEntityAssembler.toResourceFromEntity(reviewOptional.get());
+        return ResponseEntity.ok(reviewResource);
     }
 
     @PostMapping
