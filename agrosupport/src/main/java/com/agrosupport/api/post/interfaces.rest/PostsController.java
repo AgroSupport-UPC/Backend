@@ -40,12 +40,26 @@ public class PostsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResource>> getAllPosts() {
-        var getAllPostsQuery = new GetAllPostsQuery();
-        var posts = postQueryService.handle(getAllPostsQuery);
-        var postResources = posts.stream().map(PostResourceFromEntityAssembler::toResourceFromEntity).toList();
+    public ResponseEntity<List<PostResource>> getPosts(
+            @RequestParam(value = "advisorId", required = false) Long advisorId) {
+
+        List<Post> posts;
+
+        if (advisorId != null) {
+            var getPostsByAdvisorIdQuery = new GetPostByAdvisorIdQuery(advisorId);
+            posts = postQueryService.handle(getPostsByAdvisorIdQuery);
+        } else {
+            var getAllPostsQuery = new GetAllPostsQuery();
+            posts = postQueryService.handle(getAllPostsQuery);
+        }
+
+        var postResources = posts.stream()
+                .map(PostResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
         return ResponseEntity.ok(postResources);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<PostResource> getPostById(@PathVariable Long id) {
@@ -56,14 +70,6 @@ public class PostsController {
         }
         var postResource = PostResourceFromEntityAssembler.toResourceFromEntity(post.get());
         return ResponseEntity.ok(postResource);
-    }
-
-    @GetMapping("/{advisorId}/advisor")
-    public ResponseEntity<List<PostResource>> getPostsByAdvisorId(@PathVariable Long advisorId) {
-        var getPostsByAdvisorIdQuery = new GetPostByAdvisorIdQuery(advisorId);
-        var posts = postQueryService.handle(getPostsByAdvisorIdQuery);
-        var postResources = posts.stream().map(PostResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(postResources);
     }
 
     @PostMapping

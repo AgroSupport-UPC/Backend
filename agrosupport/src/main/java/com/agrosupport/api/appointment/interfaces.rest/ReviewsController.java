@@ -40,12 +40,26 @@ public class ReviewsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewResource>> getAllReviews() {
-        var getAllReviewsQuery = new GetAllReviewsQuery();
-        var reviews = reviewQueryService.handle(getAllReviewsQuery);
-        var reviewResources = reviews.stream().map(ReviewResourceFromEntityAssembler::toResourceFromEntity).toList();
+    public ResponseEntity<List<ReviewResource>> getReviews(
+            @RequestParam(value = "advisorId", required = false) Long advisorId) {
+
+        List<Review> reviews;
+
+        if (advisorId != null) {
+            var query = new GetReviewByAdvisorIdQuery(advisorId);
+            reviews = reviewQueryService.handle(query);
+        } else {
+            var getAllReviewsQuery = new GetAllReviewsQuery();
+            reviews = reviewQueryService.handle(getAllReviewsQuery);
+        }
+
+        var reviewResources = reviews.stream()
+                .map(ReviewResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
         return ResponseEntity.ok(reviewResources);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ReviewResource> getReviewById(@PathVariable Long id) {
@@ -56,14 +70,6 @@ public class ReviewsController {
         }
         var reviewResource = ReviewResourceFromEntityAssembler.toResourceFromEntity(review.get());
         return ResponseEntity.ok(reviewResource);
-    }
-
-    @GetMapping("/{advisorId}/advisor")
-    public ResponseEntity<List<ReviewResource>> getReviewsByAdvisorId(@PathVariable Long advisorId) {
-        var getReviewByAdvisorIdQuery = new GetReviewByAdvisorIdQuery(advisorId);
-        var reviews = reviewQueryService.handle(getReviewByAdvisorIdQuery);
-        var reviewResources = reviews.stream().map(ReviewResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(reviewResources);
     }
 
     @PostMapping
