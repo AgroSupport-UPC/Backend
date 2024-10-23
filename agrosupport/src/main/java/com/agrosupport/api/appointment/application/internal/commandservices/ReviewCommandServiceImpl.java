@@ -11,6 +11,8 @@ import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositori
 import org.springframework.stereotype.Service;
 
 import java.io.Console;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 @Service
@@ -59,11 +61,14 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     private void updateAdvisorRating(Long advisorId) {
         var reviews = reviewRepository.findByAdvisor_Id(advisorId);
         if (reviews.isEmpty()) return;
-        int rating = 0;
+
+        BigDecimal totalRating = BigDecimal.ZERO;
+
         for (Review review : reviews) {
-            rating += review.getRating();
+            totalRating = totalRating.add(BigDecimal.valueOf(review.getRating()));
         }
-        rating = Math.round((float) rating / reviews.size());
-        externalProfilesService.updateRating(advisorId, rating);
+
+        BigDecimal averageRating = totalRating.divide(BigDecimal.valueOf(reviews.size()), 2, RoundingMode.HALF_UP);
+        externalProfilesService.updateRating(advisorId, averageRating);
     }
 }

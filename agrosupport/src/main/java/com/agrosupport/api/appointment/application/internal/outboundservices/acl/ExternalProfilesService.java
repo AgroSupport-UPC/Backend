@@ -7,6 +7,7 @@ import com.agrosupport.api.profile.interfaces.acl.ProfilesContextFacade;
 import com.agrosupport.api.profile.interfaces.rest.resources.CreateNotificationResource;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class ExternalProfilesService {
         return profilesContextFacade.fetchProfileByAdvisorId(advisorId);
     }
 
-    public void updateRating(Long advisorId, int rating) {
+    public void updateRating(Long advisorId, BigDecimal rating) {
         profilesContextFacade.updateRating(advisorId, rating);
     }
 

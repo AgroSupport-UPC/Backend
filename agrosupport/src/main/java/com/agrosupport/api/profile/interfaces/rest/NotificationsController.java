@@ -3,6 +3,7 @@ package com.agrosupport.api.profile.interfaces.rest;
 import com.agrosupport.api.profile.domain.model.commands.DeleteNotificationCommand;
 import com.agrosupport.api.profile.domain.model.queries.GetAllNotificationsQuery;
 import com.agrosupport.api.profile.domain.model.queries.GetNotificationByIdQuery;
+import com.agrosupport.api.profile.domain.model.queries.GetNotificationsByUserIdQuery;
 import com.agrosupport.api.profile.domain.services.NotificationCommandService;
 import com.agrosupport.api.profile.domain.services.NotificationQueryService;
 import com.agrosupport.api.profile.interfaces.rest.resources.CreateNotificationResource;
@@ -38,6 +39,14 @@ public class NotificationsController {
     public ResponseEntity<List<NotificationResource>> getAllNotifications() {
         var getAllNotificationsQuery = new GetAllNotificationsQuery();
         var notifications = notificationQueryService.handle(getAllNotificationsQuery);
+        var notificationResources = notifications.stream().map(NotificationResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(notificationResources);
+    }
+
+    @GetMapping("/{userId}/user")
+    public ResponseEntity<List<NotificationResource>> getNotificationsByUserId(@PathVariable Long userId) {
+        var getNotificationsByUserIdQuery = new GetNotificationsByUserIdQuery(userId);
+        var notifications = notificationQueryService.handle(getNotificationsByUserIdQuery);
         var notificationResources = notifications.stream().map(NotificationResourceFromEntityAssembler::toResourceFromEntity).toList();
         return ResponseEntity.ok(notificationResources);
     }
