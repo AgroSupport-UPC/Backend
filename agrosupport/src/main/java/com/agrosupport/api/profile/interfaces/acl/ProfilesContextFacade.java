@@ -14,6 +14,7 @@ import com.agrosupport.api.profile.domain.services.*;
 import com.agrosupport.api.profile.interfaces.rest.resources.CreateNotificationResource;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class ProfilesContextFacade {
         return advisorQueryService.handle(getAdvisorByIdQuery);
     }
 
-    public void updateRating(Long advisorId, int rating) {
+    public void updateRating(Long advisorId, BigDecimal rating) {
         var advisor = advisorQueryService.handle(new GetAdvisorByIdQuery(advisorId));
         if (advisor.isEmpty()) return;
         advisorCommandService.handle(new UpdateAdvisorCommand(advisor.get().getId(), rating));

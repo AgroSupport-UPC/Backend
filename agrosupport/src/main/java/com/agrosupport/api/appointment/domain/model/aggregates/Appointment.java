@@ -22,7 +22,6 @@ public class Appointment extends AuditableAbstractAggregateRoot<Appointment> {
     private String message;
 
     @NotNull(message = "Date is required")
-    @FutureOrPresent(message = "Date must be in the future")
     private LocalDate scheduledDate;
 
     @NotNull(message = "Starting time is required")

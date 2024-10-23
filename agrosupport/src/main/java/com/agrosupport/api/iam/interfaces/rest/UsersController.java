@@ -44,14 +44,14 @@ public class UsersController {
 
     /**
      * This method returns the user with the given id.
-     * @param userId the user id
+     * @param id the user id
      * @return the user resource with the given id
      * @throws RuntimeException if the user is not found
      * @see UserResource
      */
-    @GetMapping(value = "/{userId}")
-    public ResponseEntity<UserResource> getUserById(@PathVariable Long userId) {
-        var getUserByIdQuery = new GetUserByIdQuery(userId);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<UserResource> getUserById(@PathVariable Long id) {
+        var getUserByIdQuery = new GetUserByIdQuery(id);
         var user = userQueryService.handle(getUserByIdQuery);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();

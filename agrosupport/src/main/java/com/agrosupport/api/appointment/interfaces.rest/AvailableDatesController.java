@@ -1,10 +1,10 @@
 package com.agrosupport.api.appointment.interfaces.rest;
 
-import com.agrosupport.api.appointment.domain.model.commands.CreateAvailableDateCommand;
 import com.agrosupport.api.appointment.domain.model.commands.DeleteAvailableDateCommand;
 import com.agrosupport.api.appointment.domain.model.entities.AvailableDate;
 import com.agrosupport.api.appointment.domain.model.queries.GetAllAvailableDatesQuery;
 import com.agrosupport.api.appointment.domain.model.queries.GetAvailableDateByIdQuery;
+import com.agrosupport.api.appointment.domain.model.queries.GetAvailableDatesByAdvisorIdQuery;
 import com.agrosupport.api.appointment.domain.services.AvailableDateCommandService;
 import com.agrosupport.api.appointment.domain.services.AvailableDateQueryService;
 import com.agrosupport.api.appointment.interfaces.rest.resources.AvailableDateResource;
@@ -40,12 +40,26 @@ public class AvailableDatesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AvailableDateResource>> getAllAvailableDates() {
-        var getAllAvailableDatesQuery = new GetAllAvailableDatesQuery();
-        var availableDates = availableDateQueryService.handle(getAllAvailableDatesQuery);
-        var availableDateResources = availableDates.stream().map(AvailableDateResourceFromEntityAssembler::toResourceFromEntity).toList();
+    public ResponseEntity<List<AvailableDateResource>> getAvailableDates(
+            @RequestParam(value = "advisorId", required = false) Long advisorId) {
+
+        List<AvailableDate> availableDates;
+
+        if (advisorId != null) {
+            var query = new GetAvailableDatesByAdvisorIdQuery(advisorId);
+            availableDates = availableDateQueryService.handle(query);
+        } else {
+            var getAllAvailableDatesQuery = new GetAllAvailableDatesQuery();
+            availableDates = availableDateQueryService.handle(getAllAvailableDatesQuery);
+        }
+
+        var availableDateResources = availableDates.stream()
+                .map(AvailableDateResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
         return ResponseEntity.ok(availableDateResources);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<AvailableDateResource> getAvailableDateById(@PathVariable Long id) {

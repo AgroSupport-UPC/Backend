@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 public class Advisor {
@@ -20,14 +22,15 @@ public class Advisor {
     private User user;
 
     @NotNull(message = "Rating is required")
-    Integer rating;
+    @Column(precision = 3, scale = 2)
+    BigDecimal rating;
 
     public Advisor() {
-        this.rating = 0;
+        this.rating = BigDecimal.valueOf(0.00);
     }
 
     public Advisor(User user) {
-        this.rating = 0;
+        this.rating = BigDecimal.valueOf(0.00);
         this.user = user;
     }
 
