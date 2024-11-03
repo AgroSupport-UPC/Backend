@@ -18,7 +18,6 @@ import lombok.Getter;
 public class Post extends AuditableAbstractAggregateRoot<Post> {
     @NotNull(message = "Title is required")
     @NotBlank(message = "Title cannot be blank")
-    @Max(50)
     private String title;
     @NotNull(message = "Description is required")
     @NotBlank(message = "Description cannot be blank")

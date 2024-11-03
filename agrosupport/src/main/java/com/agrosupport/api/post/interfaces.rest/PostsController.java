@@ -3,6 +3,7 @@ package com.agrosupport.api.post.interfaces.rest;
 import com.agrosupport.api.post.domain.model.aggregates.Post;
 import com.agrosupport.api.post.domain.model.commands.DeletePostCommand;
 import com.agrosupport.api.post.domain.model.queries.GetAllPostsQuery;
+import com.agrosupport.api.post.domain.model.queries.GetPostByAdvisorIdQuery;
 import com.agrosupport.api.post.domain.model.queries.GetPostByIdQuery;
 import com.agrosupport.api.post.domain.services.PostCommandService;
 import com.agrosupport.api.post.domain.services.PostQueryService;
@@ -39,12 +40,26 @@ public class PostsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResource>> getAllPosts() {
-        var getAllPostsQuery = new GetAllPostsQuery();
-        var posts = postQueryService.handle(getAllPostsQuery);
-        var postResources = posts.stream().map(PostResourceFromEntityAssembler::toResourceFromEntity).toList();
+    public ResponseEntity<List<PostResource>> getPosts(
+            @RequestParam(value = "advisorId", required = false) Long advisorId) {
+
+        List<Post> posts;
+
+        if (advisorId != null) {
+            var getPostsByAdvisorIdQuery = new GetPostByAdvisorIdQuery(advisorId);
+            posts = postQueryService.handle(getPostsByAdvisorIdQuery);
+        } else {
+            var getAllPostsQuery = new GetAllPostsQuery();
+            posts = postQueryService.handle(getAllPostsQuery);
+        }
+
+        var postResources = posts.stream()
+                .map(PostResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
         return ResponseEntity.ok(postResources);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<PostResource> getPostById(@PathVariable Long id) {

@@ -1,10 +1,7 @@
 package com.agrosupport.api.appointment.application.internal.queryservices;
 
 import com.agrosupport.api.appointment.domain.model.entities.Review;
-import com.agrosupport.api.appointment.domain.model.queries.GetAllReviewsQuery;
-import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdAndFarmerIdQuery;
-import com.agrosupport.api.appointment.domain.model.queries.GetReviewByAdvisorIdQuery;
-import com.agrosupport.api.appointment.domain.model.queries.GetReviewByIdQuery;
+import com.agrosupport.api.appointment.domain.model.queries.*;
 import com.agrosupport.api.appointment.domain.services.ReviewQueryService;
 import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositories.ReviewRepository;
 import org.springframework.stereotype.Service;
@@ -33,6 +30,11 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     @Override
     public List<Review> handle(GetReviewByAdvisorIdQuery query) {
         return reviewRepository.findByAdvisor_Id(query.advisorId());
+    }
+
+    @Override
+    public List<Review> handle(GetReviewByFarmerIdQuery query) {
+        return reviewRepository.findByFarmer_Id(query.farmerId());
     }
 
     @Override
