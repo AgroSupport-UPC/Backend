@@ -7,6 +7,8 @@ import com.agrosupport.api.appointment.domain.services.AppointmentQueryService;
 import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositories.AppointmentRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +62,22 @@ public class AppointmentQueryServiceImpl implements AppointmentQueryService {
     }
 
     private void updateAppointmentStatus(Appointment appointment) {
-        if (appointment.getScheduledDate().isBefore(java.time.LocalDate.now())) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime appointmentStartDateTime = LocalDateTime.of(appointment.getScheduledDate(), LocalTime.parse(appointment.getStartTime()));
+        LocalDateTime appointmentEndDateTime = LocalDateTime.of(appointment.getScheduledDate(), LocalTime.parse(appointment.getEndTime()));
+
+        if (now.isAfter(appointmentStartDateTime) && now.isBefore(appointmentEndDateTime)) {
+            var updateAppointmentCommand = new UpdateAppointmentCommand(
+                    appointment.getId(),
+                    appointment.getMessage(),
+                    "ONGOING",
+                    appointment.getScheduledDate(),
+                    appointment.getStartTime(),
+                    appointment.getEndTime()
+            );
+            appointment.update(updateAppointmentCommand);
+            this.appointmentRepository.save(appointment);
+        } else if (now.isAfter(appointmentEndDateTime)) {
             var updateAppointmentCommand = new UpdateAppointmentCommand(
                     appointment.getId(),
                     appointment.getMessage(),
