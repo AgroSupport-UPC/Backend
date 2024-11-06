@@ -8,6 +8,7 @@ import com.agrosupport.api.appointment.domain.services.AvailableDateQueryService
 import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositories.AvailableDateRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,16 +22,34 @@ public class AvailableDateQueryServiceImpl implements AvailableDateQueryService 
 
     @Override
     public List<AvailableDate> handle(GetAllAvailableDatesQuery query) {
-        return availableDateRepository.findAll();
+        List<AvailableDate> availableDates = availableDateRepository.findAll();
+        removePastAvailableDates(availableDates);
+        return availableDates;
     }
 
     @Override
     public Optional<AvailableDate> handle(GetAvailableDateByIdQuery query) {
-        return availableDateRepository.findById(query.id());
+        Optional<AvailableDate> availableDate = availableDateRepository.findById(query.id());
+        availableDate.ifPresent(this::removePastAvailableDate);
+        return availableDate;
     }
 
     @Override
     public List<AvailableDate> handle(GetAvailableDatesByAdvisorIdQuery query) {
-        return availableDateRepository.findByAdvisor_Id(query.advisorId());
+        List<AvailableDate> availableDates = availableDateRepository.findByAdvisor_Id(query.advisorId());
+        removePastAvailableDates(availableDates);
+        return availableDates;
+    }
+
+    private void removePastAvailableDates(List<AvailableDate> availableDates) {
+        for (AvailableDate availableDate : availableDates) {
+            removePastAvailableDate(availableDate);
+        }
+    }
+
+    private void removePastAvailableDate(AvailableDate availableDate) {
+        if (availableDate.getAvailableDate().isBefore(LocalDate.now())) {
+            availableDateRepository.delete(availableDate);
+        }
     }
 }

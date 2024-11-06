@@ -9,10 +9,15 @@ import com.agrosupport.api.appointment.domain.model.aggregates.Appointment;
 import com.agrosupport.api.appointment.domain.model.commands.CreateAppointmentCommand;
 import com.agrosupport.api.appointment.domain.model.commands.DeleteAppointmentCommand;
 import com.agrosupport.api.appointment.domain.model.commands.UpdateAppointmentCommand;
+import com.agrosupport.api.appointment.domain.model.valueobjects.AppointmentStatus;
 import com.agrosupport.api.appointment.domain.services.AppointmentCommandService;
 import com.agrosupport.api.appointment.infrastructure.persistence.jpa.repositories.AppointmentRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -69,5 +74,47 @@ public class AppointmentCommandServiceImpl implements AppointmentCommandService 
         var appointment = appointmentRepository.findById(command.id());
         if (appointment.isEmpty()) throw new AdvisorNotFoundException(command.id());
         appointmentRepository.delete(appointment.get());
+    }
+
+    public void updateAppointmentStatuses(List<Appointment> appointments) {
+        for (Appointment appointment : appointments) {
+            updateAppointmentStatus(appointment);
+        }
+    }
+
+    public void updateAppointmentStatus(Appointment appointment) {
+        // If the appointment has already been reviewed, do not update the status
+        if (Objects.equals(appointment.getAppointmentStatus(), AppointmentStatus.REVIEWED.name())) {
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = LocalDateTime.of(appointment.getScheduledDate(), LocalTime.parse(appointment.getStartTime()));
+        LocalDateTime end = LocalDateTime.of(appointment.getScheduledDate(), LocalTime.parse(appointment.getEndTime()));
+
+        // Determine the new status
+        String newStatus;
+        if (now.isAfter(end)) {
+            newStatus = AppointmentStatus.COMPLETED.name();
+        } else if (now.isAfter(start) && now.isBefore(end)) {
+            newStatus = AppointmentStatus.ONGOING.name();
+        } else {
+            newStatus = appointment.getAppointmentStatus();
+        }
+
+        // Update the status if it has changed
+        if (!appointment.getAppointmentStatus().equals(newStatus)) {
+            var updateCommand = new UpdateAppointmentCommand(
+                    appointment.getId(),
+                    appointment.getMessage(),
+                    newStatus,
+                    appointment.getScheduledDate(),
+                    appointment.getStartTime(),
+                    appointment.getEndTime()
+            );
+
+            appointment.update(updateCommand);
+            appointmentRepository.save(appointment);
+        }
     }
 }

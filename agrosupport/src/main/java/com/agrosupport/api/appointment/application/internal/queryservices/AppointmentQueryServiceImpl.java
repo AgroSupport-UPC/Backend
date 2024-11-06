@@ -1,5 +1,6 @@
 package com.agrosupport.api.appointment.application.internal.queryservices;
 
+import com.agrosupport.api.appointment.application.internal.commandservices.AppointmentCommandServiceImpl;
 import com.agrosupport.api.appointment.domain.model.aggregates.Appointment;
 import com.agrosupport.api.appointment.domain.model.queries.*;
 import com.agrosupport.api.appointment.domain.services.AppointmentQueryService;
@@ -12,33 +13,45 @@ import java.util.Optional;
 @Service
 public class AppointmentQueryServiceImpl implements AppointmentQueryService {
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentCommandServiceImpl appointmentCommandService;
 
-    public AppointmentQueryServiceImpl(AppointmentRepository appointmentRepository) {
+    public AppointmentQueryServiceImpl(AppointmentRepository appointmentRepository, AppointmentCommandServiceImpl appointmentCommandService) {
         this.appointmentRepository = appointmentRepository;
+        this.appointmentCommandService = appointmentCommandService;
     }
 
     @Override
     public List<Appointment> handle(GetAllAppointmentsQuery query) {
-        return this.appointmentRepository.findAll();
+        List<Appointment> appointments = this.appointmentRepository.findAll();
+        appointmentCommandService.updateAppointmentStatuses(appointments);
+        return appointments;
     }
 
     @Override
     public Optional<Appointment> handle(GetAppointmentByIdQuery query) {
-        return this.appointmentRepository.findById(query.id());
+        Optional<Appointment> appointment = this.appointmentRepository.findById(query.id());
+        appointment.ifPresent(appointmentCommandService::updateAppointmentStatus);
+        return appointment;
     }
 
     @Override
     public List<Appointment> handle(GetAppointmentsByFarmerIdQuery query) {
-        return this.appointmentRepository.findByFarmer_Id(query.farmerId());
+        List<Appointment> appointments = this.appointmentRepository.findByFarmer_Id(query.farmerId());
+        appointmentCommandService.updateAppointmentStatuses(appointments);
+        return appointments;
     }
 
     @Override
     public List<Appointment> handle(GetAppointmentsByAdvisorIdQuery query) {
-        return this.appointmentRepository.findByAdvisor_Id(query.advisorId());
+        List<Appointment> appointments = this.appointmentRepository.findByAdvisor_Id(query.advisorId());
+        appointmentCommandService.updateAppointmentStatuses(appointments);
+        return appointments;
     }
 
     @Override
     public List<Appointment> handle(GetAppointmentsByAdvisorIdAndFarmerIdQuery query) {
-        return this.appointmentRepository.findByAdvisor_IdAndFarmer_Id(query.advisorId(), query.farmerId());
+        List<Appointment> appointments = this.appointmentRepository.findByAdvisor_IdAndFarmer_Id(query.advisorId(), query.farmerId());
+        appointmentCommandService.updateAppointmentStatuses(appointments);
+        return appointments;
     }
 }
